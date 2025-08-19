@@ -20,7 +20,7 @@ embeddings = download_hugging_face_embeddings()
 pc = Pinecone(api_key=PINECONE_API_KEY)
 index_name = "medical-chatbot"
 
-# Connect to existing Pinecone index
+# Connect to  Pinecone index
 docsearch = PineconeVectorStore.from_existing_index(
     index_name=index_name,
     embedding=embeddings
@@ -33,7 +33,7 @@ llm = ChatGroq(
     model_name="llama3-70b-8192"
 )
 
-# Build prompt template
+
 prompt_template = ChatPromptTemplate.from_messages(
     [
         ("system", system_prompt),
@@ -49,20 +49,20 @@ def home():
 def chat():
     user_input = request.json.get("message")
 
-    # Retrieve relevant docs
+    
     retriever = docsearch.as_retriever(search_kwargs={"k": 3})
     docs = retriever.get_relevant_documents(user_input)
 
-    # Prepare context
+    
     context = "\n".join([doc.page_content for doc in docs])
 
-    # Format final prompt
+    
     final_prompt = prompt_template.format_messages(
         question=user_input,
         context=context
     )
 
-    # Generate response
+    
     response = llm(final_prompt)
 
     return jsonify({"response": response.content})
@@ -70,3 +70,7 @@ def chat():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+
